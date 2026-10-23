@@ -72,7 +72,7 @@ function App() {
     // The web search found nobody (e.g. a misspelled company): keep the current results
     if (status === 'no_results') {
       setSearchError(
-        `No LinkedIn profiles found for "${next.company}" (${next.role}). Check the spelling or try a broader role.`
+        `No LinkedIn profiles found for “${next.company}” (${next.role}). Check the spelling or try a broader role.`
       );
       return;
     }
@@ -86,10 +86,10 @@ function App() {
     <div className="min-h-dvh flex flex-col">
       <header className="border-b border-line">
         <div className="max-w-3xl mx-auto px-4 h-12 flex items-center justify-between">
-          <span className="flex items-center gap-2 font-semibold">
+          <h1 className="flex items-center gap-2 font-semibold">
             <span className="w-3.5 h-3.5 rounded-[4px] bg-accent" aria-hidden="true" />
             LinkedIn Scout
-          </span>
+          </h1>
           <nav className="flex items-center gap-4 text-[13px] text-muted">
             <a href={DOCS_URL} className="hover:text-ink">How it works</a>
             <a href={REPO_URL} className="hover:text-ink">GitHub</a>

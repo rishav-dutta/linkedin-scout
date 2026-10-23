@@ -11,7 +11,7 @@ export function IdleState({ onPick }: { onPick: (company: string, role: string) 
   return (
     <div className="rounded-lg border border-line bg-bg fade-in">
       <div className="px-4 py-4 border-b border-line">
-        <h1 className="text-[15px] font-semibold">Find who to reach out to at a company</h1>
+        <h2 className="text-[15px] font-semibold">Find who to reach out to at a company</h2>
         <p className="mt-1 text-muted text-[13px] max-w-xl">
           Search a company and a role to see who works there. Then add your resume, and everyone is ranked by how
           closely their background matches yours, with a reason for each score.

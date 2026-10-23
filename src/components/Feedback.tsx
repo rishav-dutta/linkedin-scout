@@ -7,7 +7,7 @@ export function ErrorBanner({ message }: { message: string }) {
       role="alert"
       className="flex items-start gap-2 rounded-md bg-danger-soft px-3 py-2 text-[13px] text-danger text-left"
     >
-      <AlertCircle className="w-4 h-4 mt-px shrink-0" />
+      <AlertCircle className="w-4 h-4 mt-px shrink-0" aria-hidden="true" />
       <span>{message}</span>
     </div>
   );
