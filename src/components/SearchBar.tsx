@@ -36,10 +36,13 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
         <input
           ref={companyRef}
           id="company"
+          name="company"
           value={company}
           onChange={(e) => onCompanyChange(e.target.value)}
           placeholder="Company, e.g. Google"
-          autoComplete="organization"
+          // "organization" would suggest the visitor's own employer, not the one they're researching
+          autoComplete="off"
+          spellCheck={false}
           enterKeyHint="next"
           className={fieldClass}
           required
@@ -51,9 +54,11 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
         </label>
         <input
           id="role"
+          name="role"
           value={role}
           onChange={(e) => onRoleChange(e.target.value)}
           placeholder="Role or team, e.g. Product"
+          autoComplete="off"
           enterKeyHint="search"
           className={fieldClass}
           required

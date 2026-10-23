@@ -28,6 +28,11 @@ function isTyping(target: EventTarget | null) {
   return target instanceof HTMLElement && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
 }
 
+// A focused button or link handles Enter itself (opening that row, following that link)
+function isControl(target: EventTarget | null) {
+  return target instanceof HTMLElement && target.closest('a, button, label') !== null;
+}
+
 export function Results({ searchId, company, role, ranked, resumeName, onScored }: ResultsProps) {
   // Before scoring, contacts show as soon as the web search is saved and the
   // full profiles (needed for scoring) arrive a little later, so uploading waits for them
@@ -62,7 +67,7 @@ export function Results({ searchId, company, role, ranked, resumeName, onScored 
       } else if (e.key === 'ArrowUp' || e.key === 'k') {
         e.preventDefault();
         setSelected((i) => (i === null ? 0 : Math.max(i - 1, 0)));
-      } else if (e.key === 'Enter' && selected !== null && leads[selected]) {
+      } else if (e.key === 'Enter' && selected !== null && leads[selected] && !isControl(e.target)) {
         e.preventDefault();
         toggle(leads[selected], selected);
       }
@@ -109,7 +114,7 @@ export function Results({ searchId, company, role, ranked, resumeName, onScored 
         ) : loadFailed ? (
           <div className="px-4 py-10 text-center">
             <p className="text-muted mb-2">Could not load contacts.</p>
-            <button onClick={reload} className="pressable text-[13px] font-medium underline underline-offset-2">
+            <button onClick={reload} className="pressable text-[13px] font-medium underline underline-offset-2 decoration-faint hover:decoration-ink">
               Try again
             </button>
           </div>
@@ -157,10 +162,10 @@ function SkeletonRows() {
       {[0, 1, 2, 3].map((i) => (
         <li key={i} className="flex items-center gap-3 px-4 py-3">
           <span className="w-6" />
-          <span className="w-8 h-8 rounded-full bg-hover animate-pulse" />
+          <span className="w-8 h-8 rounded-full bg-hover motion-safe:animate-pulse" />
           <span className="flex-1 space-y-1.5">
-            <span className="block h-3 w-32 rounded bg-hover animate-pulse" />
-            <span className="block h-3 w-56 max-w-full rounded bg-hover animate-pulse" />
+            <span className="block h-3 w-32 rounded bg-hover motion-safe:animate-pulse" />
+            <span className="block h-3 w-56 max-w-full rounded bg-hover motion-safe:animate-pulse" />
           </span>
         </li>
       ))}
@@ -240,7 +245,7 @@ function PersonRow({ lead, rank, ranked, loadingProfile, selected, expanded, onT
           title="Open on LinkedIn"
           className="pressable mt-1 w-7 h-7 rounded-md inline-flex items-center justify-center text-faint hover:text-ink hover:bg-hover"
         >
-          <Linkedin className="w-4 h-4" />
+          <Linkedin className="w-4 h-4" aria-hidden="true" />
         </a>
       </div>
 
@@ -280,6 +285,7 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
   const [scanningName, setScanningName] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const canUpload = hasLeads && details === 'ready' && !isScanning;
 
@@ -304,7 +310,7 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
       return;
     }
     if (file.size > MAX_RESUME_BYTES) {
-      setUploadError('That file is over 5 MB. Please upload a smaller PDF.');
+      setUploadError('That file is over 5\u00a0MB. Please upload a smaller PDF.');
       return;
     }
 
@@ -349,7 +355,7 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
       </>
     );
   } else if (!hasLeads) {
-    icon = <FileUp className="w-4 h-4 text-faint" />;
+    icon = <FileUp className="w-4 h-4 text-faint" aria-hidden="true" />;
     message = <span className="text-muted">Add your resume once people are found</span>;
   } else if (details === 'loading') {
     icon = <Spinner />;
@@ -359,20 +365,20 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
       </>
     );
   } else if (details === 'failed') {
-    icon = <FileUp className="w-4 h-4 text-faint" />;
+    icon = <FileUp className="w-4 h-4 text-faint" aria-hidden="true" />;
     message = <span className="text-muted">These people can't be scored because their profiles didn't load</span>;
   } else if (isDragging) {
-    icon = <FileUp className="w-4 h-4 text-accent" />;
+    icon = <FileUp className="w-4 h-4 text-accent" aria-hidden="true" />;
     message = 'Drop your resume to rank them';
   } else if (resumeName) {
-    icon = <Check className="w-4 h-4 text-accent" />;
+    icon = <Check className="w-4 h-4 text-accent" aria-hidden="true" />;
     message = (
       <>
         Ranked against <FileName name={resumeName} />
       </>
     );
   } else {
-    icon = <FileUp className="w-4 h-4 text-accent" />;
+    icon = <FileUp className="w-4 h-4 text-accent" aria-hidden="true" />;
     message = (
       <>
         Rank {count === 1 ? 'this person' : `these ${count} people`} against your resume
@@ -384,6 +390,7 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
   return (
     <div className="space-y-2">
       <input
+        ref={fileInputRef}
         type="file"
         accept=".pdf,application/pdf"
         onChange={(e) => {
@@ -414,11 +421,16 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
       >
         {/* pointer-events-none stops child elements from firing dragleave on the bar */}
         <span className="shrink-0 pointer-events-none">{icon}</span>
-        <p className="flex-1 min-w-0 text-[13px] pointer-events-none">{message}</p>
+        {/* Announced to screen readers as it changes: loading, ready to upload, scoring, ranked */}
+        <p role="status" className="flex-1 min-w-0 text-[13px] pointer-events-none">
+          {message}
+        </p>
+        {/* A button, not a label for the hidden input: labels can't be reached with Tab */}
         {canUpload && (
-          <label
-            htmlFor="resume-upload"
-            className="pressable shrink-0 h-8 px-3 rounded-md border border-line bg-bg text-[13px] font-medium inline-flex items-center hover:bg-hover cursor-pointer"
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="pressable shrink-0 h-8 px-3 rounded-md border border-line bg-bg text-[13px] font-medium inline-flex items-center hover:bg-hover"
           >
             {resumeName ? (
               <>
@@ -427,7 +439,7 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
             ) : (
               'Choose PDF'
             )}
-          </label>
+          </button>
         )}
       </div>
       {details === 'failed' && !isScanning && (
