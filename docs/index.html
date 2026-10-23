@@ -25,11 +25,10 @@
   --line: #e7e7ea;
   --ink: #18181b;
   --muted: #71717a;
-  --faint: #a1a1aa;
+  --faint: #8b8b93;
   --accent: #f25c05;
   --on-ink: #ffffff;
   --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
   --text: 640px;
   --wide: 760px;
 }
@@ -41,7 +40,7 @@
     --line: #26262b;
     --ink: #ededef;
     --muted: #8b8b94;
-    --faint: #5f5f68;
+    --faint: #6b6b74;
     --accent: #ff7a2e;
     --on-ink: #0c0c0e;
   }
@@ -90,7 +89,7 @@ strong { font-weight: 600; }
 /* ---------- The result, rebuilt with the app's styles ---------- */
 .app { font-size: 14px; line-height: 1.45; display: grid; gap: 12px; margin-bottom: 0.75rem; }
 .app svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-.bar { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.bar { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
 .bar .field { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 10px 12px; }
 .bar .field + .field { border-left: 1px solid var(--line); }
 .bar .field svg { color: var(--faint); }
@@ -106,23 +105,23 @@ strong { font-weight: 600; }
 .list-head { padding-top: 8px; padding-bottom: 8px; background: var(--panel); border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
 .list-head span:first-child, .rank { text-align: right; }
 .row + .row, .reason + .row { border-top: 1px solid var(--line); }
-.rank { padding-top: 8px; font-family: var(--mono); font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.rank { padding-top: 8px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .who { display: flex; gap: 12px; min-width: 0; }
 .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--hover); color: var(--muted); font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex: none; }
 .who b { display: flex; align-items: center; gap: 4px; font-weight: 500; line-height: 20px; }
 .who b svg { width: 14px; height: 14px; color: var(--faint); }
 .who div > span { display: block; font-size: 13px; color: var(--muted); line-height: 20px; }
 .score { padding-top: 6px; display: flex; align-items: center; gap: 8px; }
-.score i { font-style: normal; font-family: var(--mono); font-size: 13px; width: 24px; text-align: right; font-variant-numeric: tabular-nums; }
+.score i { font-style: normal; font-weight: 500; font-size: 13px; width: 24px; text-align: right; font-variant-numeric: tabular-nums; }
 .score s { display: block; height: 6px; width: 64px; border-radius: 99px; background: var(--line); overflow: hidden; text-decoration: none; }
 .score s::before { content: ''; display: block; height: 100%; width: var(--w); border-radius: 99px; background: var(--accent); }
-.li { margin-top: 4px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: var(--faint); }
+.li { margin-top: 4px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: var(--muted); }
 .reason { padding: 0 16px 16px 92px; font-size: 13px; line-height: 1.6; }
 .reason p { margin: 0; border-left: 2px solid var(--accent); padding-left: 12px; max-width: none; }
 .reason p + p { border: 0; padding: 0; margin-top: 8px; color: var(--muted); }
 .list-foot { display: flex; justify-content: space-between; gap: 16px; padding: 8px 16px; border-top: 1px solid var(--line); background: var(--panel); font-size: 12px; color: var(--muted); }
 .keys { display: flex; gap: 12px; }
-.keys kbd { font-family: var(--mono); font-size: 11px; line-height: 1; padding: 3px 5px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; background: var(--bg); margin-right: 3px; }
+.keys kbd { font-size: 11px; font-variant-numeric: tabular-nums; line-height: 1; padding: 3px 5px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; background: var(--bg); margin-right: 3px; }
 figcaption { font-size: 13px; color: var(--muted); margin-top: 0.75rem; }
 
 /* Project facts */
@@ -203,7 +202,7 @@ footer { max-width: calc(var(--text) + 2rem); margin: 0 auto; padding: 0 1rem 3r
 /* The PDF version (docs/linkedin-scout.pdf) is printed from this page */
 @media print {
   @page { size: Letter; margin: 0.6in 0.65in; }
-  :root { --bg: #fff; --panel: #fafafa; --hover: #f4f4f5; --line: #e2e2e6; --ink: #18181b; --muted: #63636b; --faint: #a1a1aa; --accent: #f25c05; --on-ink: #fff; }
+  :root { --bg: #fff; --panel: #fafafa; --hover: #f4f4f5; --line: #e2e2e6; --ink: #18181b; --muted: #63636b; --faint: #8b8b93; --accent: #f25c05; --on-ink: #fff; }
   body { font-size: 10.5pt; line-height: 1.5; }
   .top, .web-only, footer { display: none; }
   .print-only { display: block; }
@@ -219,7 +218,6 @@ footer { max-width: calc(var(--text) + 2rem); margin: 0 auto; padding: 0 1rem 3r
   .print-links { font-size: 9pt; color: var(--muted); margin-bottom: 1.25rem; line-height: 1.5; }
   .app { font-size: 11px; max-width: 5.6in; margin-left: auto; margin-right: auto; gap: 8px; }
   .app .reason p + p, .app .keys { display: none; }
-  .bar { box-shadow: none; }
   .bar .go, .resume .ghost { height: 26px; font-size: 11px; }
   .resume { font-size: 11px; }
   .who div > span, .reason { font-size: 10px; line-height: 15px; }

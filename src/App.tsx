@@ -63,7 +63,7 @@ function App() {
       }
     } catch (error) {
       console.error('Search failed:', error);
-      setSearchError(await functionErrorMessage(error, 'Search failed. Please try again.'));
+      setSearchError(await functionErrorMessage(error, 'The search didn’t go through. Check your connection and try again in a minute.'));
       setIsSearching(false);
       return;
     }
@@ -91,8 +91,8 @@ function App() {
             LinkedIn Scout
           </h1>
           <nav className="flex items-center gap-4 text-[13px] text-muted">
-            <a href={DOCS_URL} className="hover:text-ink">How it works</a>
-            <a href={REPO_URL} className="hover:text-ink">GitHub</a>
+            <a href={DOCS_URL} className="hover:text-ink pointer-coarse:inline-flex pointer-coarse:items-center pointer-coarse:h-11">How it works</a>
+            <a href={REPO_URL} className="hover:text-ink pointer-coarse:inline-flex pointer-coarse:items-center pointer-coarse:h-11">GitHub</a>
           </nav>
         </div>
       </header>
@@ -106,6 +106,7 @@ function App() {
           onRoleChange={setRole}
           onSubmit={handleSearch}
           isSearching={isSearching}
+          primary={!search || resume !== null || company.trim() !== search.company || role.trim() !== search.role}
         />
         {searchError && <ErrorBanner message={searchError} />}
 
@@ -131,7 +132,7 @@ function App() {
         )}
       </main>
 
-      <footer className="max-w-3xl w-full mx-auto px-4 pb-5 pt-2 text-[12px] text-faint">
+      <footer className="max-w-3xl w-full mx-auto px-4 pb-5 pt-2 text-[12px] text-muted">
         Built by{' '}
         <a href="https://linkedin.com/in/duttarishav" className="underline underline-offset-2 hover:text-ink">
           Rishav Dutta
