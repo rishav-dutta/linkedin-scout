@@ -1,58 +1,139 @@
 @import 'tailwindcss';
 
 /*
-  Colours are CSS variables so the whole app switches to dark mode by
-  redefining them below; utilities like bg-paper or text-muted follow along.
+  Theme colours are CSS variables, so dark mode only redefines them below and
+  utilities like bg-panel or text-muted follow. Near-monochrome on purpose:
+  ink for actions, one accent for scores, focus and selection.
 */
 @theme {
-  --font-serif: 'Source Serif 4', Georgia, serif;
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
-  --color-paper: #fbfaf7;
-  --color-card: #ffffff;
-  --color-ink: #22211f;
-  --color-muted: #6b6862;
-  --color-rule: #e4e1da;
-  --color-accent: #1d4ed8;
-  --color-accent-hover: #1e40af;
-  --color-accent-soft: #e8eefc;
-  --color-danger: #b42318;
-  --color-danger-soft: #fdecea;
+  --color-bg: #ffffff;
+  --color-panel: #fafafa;
+  --color-hover: #f4f4f5;
+  --color-selected: #fff4ed;
+  --color-line: #e7e7ea;
+  --color-ink: #18181b;
+  --color-muted: #71717a;
+  --color-faint: #a1a1aa;
+  --color-accent: #f25c05;
+  --color-accent-soft: #ffe8d9;
+  --color-on-ink: #ffffff;
+  --color-danger: #c42b1c;
+  --color-danger-soft: #fdeceb;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-paper: #171716;
-    --color-card: #1f1f1d;
-    --color-ink: #e6e4df;
-    --color-muted: #9c9890;
-    --color-rule: #34332f;
-    --color-accent: #8fb0ff;
-    --color-accent-hover: #b3caff;
-    --color-accent-soft: #232b3d;
-    --color-danger: #f3a19a;
-    --color-danger-soft: #3a2220;
+    --color-bg: #0c0c0e;
+    --color-panel: #121215;
+    --color-hover: #1a1a1e;
+    --color-selected: #24170f;
+    --color-line: #26262b;
+    --color-ink: #ededef;
+    --color-muted: #8b8b94;
+    --color-faint: #5f5f68;
+    --color-accent: #ff7a2e;
+    --color-accent-soft: #3a1f0f;
+    --color-on-ink: #0c0c0e;
+    --color-danger: #ff8a7e;
+    --color-danger-soft: #3a1c1a;
   }
 }
 
 @layer base {
-  /* Tailwind v4 defaults borders to currentColor; use the theme's rule colour instead */
+  /* Tailwind v4 defaults borders to currentColor; use the theme's line colour */
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-rule);
+    border-color: var(--color-line);
   }
 
   html {
-    background: var(--color-paper);
+    background: var(--color-bg);
     color: var(--color-ink);
     color-scheme: light dark;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  /* iOS zooms into inputs under 16px and doesn't zoom back out */
+  @media (pointer: coarse) {
+    input {
+      font-size: 16px;
+    }
+  }
+
+  /* Controls fire on tap without the double-tap wait, and long-press doesn't select their label */
+  button,
+  a,
+  label[for],
+  [role='button'] {
+    touch-action: manipulation;
+  }
+  button,
+  label[for],
+  [role='button'] {
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   /* Tailwind CSS v4 no longer gives buttons a pointer cursor; keep the v3 behavior. */
   button:not(:disabled),
   [role='button']:not(:disabled) {
     cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Press feedback: quick, only on the way down */
+  .pressable {
+    transition: transform 120ms var(--ease-out), background-color 120ms ease, opacity 120ms ease;
+  }
+  .pressable:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  .kbd {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1;
+    padding: 3px 5px;
+    border: 1px solid var(--color-line);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    color: var(--color-muted);
+    background: var(--color-bg);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.fade-in {
+  animation: fade-in 180ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pressable:active:not(:disabled) {
+    transform: none;
   }
 }
