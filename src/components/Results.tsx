@@ -2,6 +2,7 @@ import { Check, ChevronDown, FileUp, Linkedin } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { functionErrorMessage, isScored, supabase, type LinkedInLead } from '../lib/supabase';
 import { useLeads, type DetailsStatus } from '../lib/useLeads';
+import { Button } from './Button';
 import { Avatar, ErrorBanner, Kbd, Spinner } from './Feedback';
 
 // Same limit the n8n-proxy Edge Function enforces
@@ -17,7 +18,7 @@ interface ResultsProps {
   onScored: (fileName: string) => void;
 }
 
-// Titles from search results often already name the company ("PM at Acme"),
+// Titles from search results often already name the company ("PM at Stripe"),
 // so only add "@ Company" when they don't
 function titleWithCompany(lead: LinkedInLead): string {
   const mentionsCompany = lead.company && lead.job_title?.toLowerCase().includes(lead.company.toLowerCase());
@@ -34,7 +35,7 @@ function isControl(target: EventTarget | null) {
 }
 
 export function Results({ searchId, company, role, ranked, resumeName, onScored }: ResultsProps) {
-  // Before scoring, contacts show as soon as the web search is saved and the
+  // Before scoring, people show as soon as the web search is saved and the
   // full profiles (needed for scoring) arrive a little later, so uploading waits for them
   const { leads: rows, isLoading, loadFailed, details, reload } = useLeads(
     searchId,
@@ -113,10 +114,8 @@ export function Results({ searchId, company, role, ranked, resumeName, onScored 
           <SkeletonRows />
         ) : loadFailed ? (
           <div className="px-4 py-10 text-center">
-            <p className="text-muted mb-2">Could not load contacts.</p>
-            <button onClick={reload} className="pressable text-[13px] font-medium underline underline-offset-2 decoration-faint hover:decoration-ink">
-              Try again
-            </button>
+            <p className="text-muted mb-3">Couldn’t load the people for this search.</p>
+            <Button onClick={reload}>Try again</Button>
           </div>
         ) : leads.length === 0 ? (
           <p className="px-4 py-10 text-center text-muted">No one found for this search. Try a different company or a broader role.</p>
@@ -162,10 +161,10 @@ function SkeletonRows() {
       {[0, 1, 2, 3].map((i) => (
         <li key={i} className="flex items-center gap-3 px-4 py-3">
           <span className="w-6" />
-          <span className="w-8 h-8 rounded-full bg-hover motion-safe:animate-pulse" />
+          <span className="w-8 h-8 rounded-full bg-hover" />
           <span className="flex-1 space-y-1.5">
-            <span className="block h-3 w-32 rounded bg-hover motion-safe:animate-pulse" />
-            <span className="block h-3 w-56 max-w-full rounded bg-hover motion-safe:animate-pulse" />
+            <span className="block h-3 w-32 rounded bg-hover" />
+            <span className="block h-3 w-56 max-w-full rounded bg-hover" />
           </span>
         </li>
       ))}
@@ -191,7 +190,7 @@ function PersonRow({ lead, rank, ranked, loadingProfile, selected, expanded, onT
   return (
     <li className={selected ? 'bg-selected' : undefined}>
       <div className="grid grid-cols-[1.5rem_1fr_auto_2rem] sm:grid-cols-[1.5rem_1fr_7.5rem_2rem] items-start gap-3 px-4 py-3 hover:bg-hover">
-        <span className="pt-2 text-right font-mono text-[12px] text-faint tabular-nums">{rank ?? '–'}</span>
+        <span className="pt-2 text-right text-[12px] text-muted tabular-nums">{rank ?? '–'}</span>
 
         <button
           type="button"
@@ -221,16 +220,16 @@ function PersonRow({ lead, rank, ranked, loadingProfile, selected, expanded, onT
           {ranked ? (
             scored ? (
               <span className="flex items-center justify-end sm:justify-start gap-2">
-                <span className="font-mono text-[13px] tabular-nums w-6 text-right">{score}</span>
+                <span className="text-[13px] font-medium tabular-nums w-6 text-right">{score}</span>
                 <span className="hidden sm:block h-1.5 w-16 rounded-full bg-line overflow-hidden" aria-hidden="true">
                   <span className="block h-full rounded-full bg-accent" style={{ width: `${score}%` }} />
                 </span>
               </span>
             ) : (
-              <span className="text-[12px] text-faint whitespace-nowrap">Not scored</span>
+              <span className="text-[12px] text-muted whitespace-nowrap">Not scored</span>
             )
           ) : loadingProfile ? (
-            <span className="flex items-center gap-1.5 text-[12px] text-faint whitespace-nowrap">
+            <span className="flex items-center gap-1.5 text-[12px] text-muted whitespace-nowrap">
               <Spinner className="w-3 h-3" />
               <span className="hidden sm:inline">Loading profile</span>
             </span>
@@ -243,7 +242,7 @@ function PersonRow({ lead, rank, ranked, loadingProfile, selected, expanded, onT
           rel="noopener noreferrer"
           aria-label={`${lead.full_name} on LinkedIn`}
           title="Open on LinkedIn"
-          className="pressable mt-1 w-7 h-7 rounded-md inline-flex items-center justify-center text-faint hover:text-ink hover:bg-hover"
+          className="pressable relative mt-1 w-7 h-7 rounded-md inline-flex items-center justify-center text-muted hover:text-ink hover:bg-hover pointer-coarse:after:absolute pointer-coarse:after:-inset-2 pointer-coarse:after:content-['']"
         >
           <Linkedin className="w-4 h-4" aria-hidden="true" />
         </a>
@@ -339,7 +338,7 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
       }
     } catch (error) {
       console.error('Error during resume processing:', error);
-      setUploadError(await functionErrorMessage(error, 'Failed to upload and process resume. Please try again.'));
+      setUploadError(await functionErrorMessage(error, 'Your resume couldn’t be scored. Upload it again in a minute.'));
     } finally {
       setIsScanning(false);
     }
@@ -361,12 +360,12 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
     icon = <Spinner />;
     message = (
       <>
-        Loading full profiles… <span className="text-muted">you can add your resume in a moment (usually 10–30 seconds)</span>
+        Loading full profiles… <span className="text-muted">you can add your resume in a moment (usually 7 to 35 seconds)</span>
       </>
     );
   } else if (details === 'failed') {
     icon = <FileUp className="w-4 h-4 text-faint" aria-hidden="true" />;
-    message = <span className="text-muted">These people can't be scored because their profiles didn't load</span>;
+    message = <span className="text-muted">Full profiles didn’t load, so these people can’t be ranked. Search again to retry.</span>;
   } else if (isDragging) {
     icon = <FileUp className="w-4 h-4 text-accent" aria-hidden="true" />;
     message = 'Drop your resume to rank them';
@@ -427,10 +426,10 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
         </p>
         {/* A button, not a label for the hidden input: labels can't be reached with Tab */}
         {canUpload && (
-          <button
-            type="button"
+          <Button
+            variant={resumeName ? 'secondary' : 'primary'}
             onClick={() => fileInputRef.current?.click()}
-            className="pressable shrink-0 h-8 px-3 rounded-md border border-line bg-bg text-[13px] font-medium inline-flex items-center hover:bg-hover"
+            className="shrink-0"
           >
             {resumeName ? (
               <>
@@ -439,12 +438,9 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
             ) : (
               'Choose PDF'
             )}
-          </button>
+          </Button>
         )}
       </div>
-      {details === 'failed' && !isScanning && (
-        <ErrorBanner message="Couldn't load profile details for these contacts. Please try a new search." />
-      )}
       {uploadError && <ErrorBanner message={uploadError} />}
     </div>
   );
