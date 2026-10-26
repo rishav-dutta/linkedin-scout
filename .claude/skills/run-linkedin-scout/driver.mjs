@@ -79,6 +79,7 @@ async function mockBackend(ctx) {
   // StrictMode runs effects twice in dev, so counting calls skips the loading state.
   let firstRead = 0;
   await ctx.route('**/_vercel/insights/**', (r) => r.abort());
+  await ctx.route('https://gc.zgo.at/**', (r) => r.abort());
   await ctx.route('https://broken.invalid/**', (r) => r.abort());
   await ctx.route('**/functions/v1/n8n-proxy/*', async (r) => {
     if (r.request().method() === 'OPTIONS') return r.fulfill({ status: 200, headers: cors });

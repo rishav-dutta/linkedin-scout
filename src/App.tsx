@@ -4,6 +4,7 @@ import { Results } from './components/Results';
 import { SearchBar } from './components/SearchBar';
 import { ErrorBanner } from './components/Feedback';
 import { supabase, functionErrorMessage } from './lib/supabase';
+import { track } from './lib/analytics';
 
 const DOCS_URL = 'https://rishav-dutta.github.io/linkedin-scout/';
 const REPO_URL = 'https://github.com/rishav-dutta/linkedin-scout';
@@ -45,6 +46,7 @@ function App() {
     const next: Search = { id: crypto.randomUUID(), company: company.trim(), role: role.trim() };
     setSearchError(null);
     setIsSearching(true);
+    track('search');
 
     let status: unknown;
     try {
@@ -63,6 +65,7 @@ function App() {
       }
     } catch (error) {
       console.error('Search failed:', error);
+      track('search-error');
       setSearchError(await functionErrorMessage(error, 'The search didn’t go through. Check your connection and try again in a minute.'));
       setIsSearching(false);
       return;
@@ -71,6 +74,7 @@ function App() {
 
     // The web search found nobody (e.g. a misspelled company): keep the current results
     if (status === 'no_results') {
+      track('search-no-results');
       setSearchError(
         `No LinkedIn profiles found for “${next.company}” (${next.role}). Check the spelling or try a broader role.`
       );
@@ -91,8 +95,8 @@ function App() {
             LinkedIn Scout
           </h1>
           <nav className="flex items-center gap-4 text-[13px] text-muted">
-            <a href={DOCS_URL} className="hover:text-ink pointer-coarse:inline-flex pointer-coarse:items-center pointer-coarse:h-11">How it works</a>
-            <a href={REPO_URL} className="hover:text-ink pointer-coarse:inline-flex pointer-coarse:items-center pointer-coarse:h-11">GitHub</a>
+            <a href={DOCS_URL} onClick={() => track('docs-link')} className="hover:text-ink pointer-coarse:inline-flex pointer-coarse:items-center pointer-coarse:h-11">How it works</a>
+            <a href={REPO_URL} onClick={() => track('github-link')} className="hover:text-ink pointer-coarse:inline-flex pointer-coarse:items-center pointer-coarse:h-11">GitHub</a>
           </nav>
         </div>
       </header>
@@ -126,17 +130,25 @@ function App() {
               setCompany(pickedCompany);
               setRole(pickedRole);
               setSearchError(null);
+              track('example-picked');
               companyRef.current?.focus();
             }}
           />
         )}
       </main>
 
-      <footer className="max-w-3xl w-full mx-auto px-4 pb-5 pt-2 text-[12px] text-muted">
-        Built by{' '}
-        <a href="https://linkedin.com/in/duttarishav" className="underline underline-offset-2 hover:text-ink">
-          Rishav Dutta
-        </a>
+      <footer className="max-w-3xl w-full mx-auto px-4 pb-5 pt-2 text-[12px] text-muted space-y-1">
+        <p>
+          Built by{' '}
+          <a
+            href="https://linkedin.com/in/duttarishav"
+            onClick={() => track('author-linkedin')}
+            className="underline underline-offset-2 hover:text-ink"
+          >
+            Rishav Dutta
+          </a>
+        </p>
+        <p>Visits are counted anonymously, without cookies. Uploaded resumes are stored privately and used only for ranking.</p>
       </footer>
     </div>
   );

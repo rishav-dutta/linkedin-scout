@@ -93,6 +93,21 @@ You need a Supabase project, an n8n instance, and Firecrawl, Apify and Gemini AP
 - Each visitor can run 5 searches and 10 resume uploads per hour (50 and 100 per day across all visitors), to protect the API credits behind the demo.
 - Uploaded resumes are stored in a private bucket.
 
+## Analytics
+
+Visits to the app and the docs page are counted with [GoatCounter](https://www.goatcounter.com): no cookies, and nothing that identifies a visitor is stored. Vercel Web Analytics also counts app page views. The app sends fixed event names only, never a searched company, a file name or anything typed, from `src/lib/analytics.ts`:
+
+| Event | When |
+|---|---|
+| `search`, `search-no-results`, `search-error` | A search is sent, finds nobody, or fails |
+| `example-picked` | An example on the start screen fills the form |
+| `profiles-failed` | Full profiles didn't load, so the people can't be ranked |
+| `resume-upload`, `resume-ranked`, `resume-error` | A resume is sent, scored, or fails |
+| `linkedin-profile` | A person's LinkedIn link is opened |
+| `docs-link`, `github-link`, `author-linkedin` | Header and footer links |
+
+The docs page counts clicks on Open the app, GitHub, LinkedIn and the PDF with `data-goatcounter-click`. Links with `?campaign=…&ref=…` show up as campaigns.
+
 ## License
 
 [MIT](LICENSE)
