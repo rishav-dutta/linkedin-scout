@@ -2,6 +2,7 @@ import { Check, ChevronDown, FileUp, Linkedin } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { functionErrorMessage, isScored, supabase, type LinkedInLead } from '../lib/supabase';
 import { useLeads, type DetailsStatus } from '../lib/useLeads';
+import { track } from '../lib/analytics';
 import { Button } from './Button';
 import { Avatar, ErrorBanner, Kbd, Spinner } from './Feedback';
 
@@ -240,6 +241,7 @@ function PersonRow({ lead, rank, ranked, loadingProfile, selected, expanded, onT
           href={lead.linkedin_url}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => track('linkedin-profile')}
           aria-label={`${lead.full_name} on LinkedIn`}
           title="Open on LinkedIn"
           className="pressable relative mt-1 w-7 h-7 rounded-md inline-flex items-center justify-center text-muted hover:text-ink hover:bg-hover pointer-coarse:after:absolute pointer-coarse:after:-inset-2 pointer-coarse:after:content-['']"
@@ -288,6 +290,10 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
 
   const canUpload = hasLeads && details === 'ready' && !isScanning;
 
+  useEffect(() => {
+    if (details === 'failed') track('profiles-failed');
+  }, [details]);
+
   // A file dropped outside the upload bar would make the browser open it and lose this search
   useEffect(() => {
     const preventFileOpen = (e: DragEvent) => e.preventDefault();
@@ -315,6 +321,7 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
 
     setIsScanning(true);
     setScanningName(file.name);
+    track('resume-upload');
 
     const formData = new FormData();
     formData.append('resume', file);
@@ -332,12 +339,14 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
       // n8n replies with a text/plain body, so the JSON may arrive as a string
       const parsed = typeof result === 'string' ? JSON.parse(result) : result;
       if (parsed?.status === 'success' || parsed?.message === 'success') {
+        track('resume-ranked');
         onScored(file.name);
       } else {
         throw new Error(`Unexpected response: ${JSON.stringify(parsed)}`);
       }
     } catch (error) {
       console.error('Error during resume processing:', error);
+      track('resume-error');
       setUploadError(await functionErrorMessage(error, 'Your resume couldn’t be scored. Upload it again in a minute.'));
     } finally {
       setIsScanning(false);

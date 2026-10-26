@@ -83,6 +83,7 @@ All pass on the current tree. `deno check` writes a `deno.lock` that isn't part 
 - **Upload stays disabled until full profiles arrive.** With mocks that takes about 3.5 s. Live, Apify takes 7–35 s (the driver waits up to 180 s).
 - **The error path logs on purpose.** The app `console.error`s failed searches (for example the 429), so the driver ignores console errors once an error banner appears.
 - **Vercel Analytics in dev** logs a debug line and requests `/_vercel/insights/*`. The driver blocks that request and filters the resulting `ERR_FAILED` console message.
+- **GoatCounter** (`gc.zgo.at/count.v5.js` in `index.html`) is an outside request, so the driver blocks it too; `track()` in `src/lib/analytics.ts` is then a no-op. GoatCounter also ignores localhost by itself, so local runs never count as visits.
 - **ESLint only covers `.ts`/`.tsx`**, so `npm run lint` doesn't check this driver.
 - **macOS has no `timeout` command.** Poll with a `for … sleep` loop, as above.
 - **Stop the server by its port, not `pkill -f vite`.** A broad pattern can match unrelated processes.
