@@ -54,8 +54,11 @@ export function Results({ searchId, company, role, ranked, resumeName, onScored 
   const isExpanded = (lead: LinkedInLead, index: number) =>
     expandedId === 'top' ? index === 0 && isScored(lead) : expandedId === lead.id;
   const toggle = (lead: LinkedInLead, index: number) => {
+    const opening = !isExpanded(lead, index);
     setSelected(index);
-    setExpandedId(isExpanded(lead, index) ? null : lead.id);
+    setExpandedId(opening ? lead.id : null);
+    // Counts rows people open to read; the top match opening by itself after ranking isn't counted
+    if (opening) track('details-opened');
   };
 
   // ↑/↓ (or j/k) move through people, Enter opens or closes the selected one.

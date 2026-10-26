@@ -14,6 +14,7 @@ export type AnalyticsEvent =
   | 'resume-upload'
   | 'resume-ranked'
   | 'resume-error'
+  | 'details-opened'
   | 'linkedin-profile'
   | 'docs-link'
   | 'github-link'
