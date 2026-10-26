@@ -103,6 +103,7 @@ Visits to the app and the docs page are counted with [GoatCounter](https://www.g
 | `example-picked` | An example on the start screen fills the form |
 | `profiles-failed` | Full profiles didn't load, so the people can't be ranked |
 | `resume-upload`, `resume-ranked`, `resume-error` | A resume is sent, scored, or fails |
+| `details-opened` | A person's row is opened to read the reason and profile summary (not the top match opening by itself) |
 | `linkedin-profile` | A person's LinkedIn link is opened |
 | `docs-link`, `github-link`, `author-linkedin` | Header and footer links |
 
