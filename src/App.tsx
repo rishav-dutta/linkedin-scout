@@ -3,7 +3,7 @@ import { IdleState } from './components/IdleState';
 import { Results } from './components/Results';
 import { SearchBar } from './components/SearchBar';
 import { ErrorBanner } from './components/Feedback';
-import { supabase, functionErrorMessage } from './lib/supabase';
+import { supabase, functionErrorMessage, isRateLimited } from './lib/supabase';
 import { track } from './lib/analytics';
 
 const DOCS_URL = 'https://rishav-dutta.github.io/linkedin-scout/';
@@ -65,7 +65,7 @@ function App() {
       }
     } catch (error) {
       console.error('Search failed:', error);
-      track('search-error');
+      track(isRateLimited(error) ? 'search-rate-limited' : 'search-error');
       setSearchError(await functionErrorMessage(error, 'The search didn’t go through. Check your connection and try again in a minute.'));
       setIsSearching(false);
       return;

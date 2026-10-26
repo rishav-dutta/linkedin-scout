@@ -438,5 +438,19 @@ footer { max-width: calc(var(--text) + 2rem); margin: 0 auto; padding: 0 1rem 3r
   <p>Visits are counted anonymously with <a href="https://www.goatcounter.com">GoatCounter</a>, without cookies.</p>
 </footer>
 
+<script>
+// Counts a docs-read-to-end event once per page view, when "About me" scrolls into view
+(function () {
+  var about = document.querySelector('.about');
+  if (!about || !('IntersectionObserver' in window)) return;
+  var seen = new IntersectionObserver(function (entries) {
+    if (!entries[0].isIntersecting) return;
+    seen.disconnect();
+    if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: 'docs-read-to-end', event: true });
+  });
+  seen.observe(about);
+})();
+</script>
+
 </body>
 </html>

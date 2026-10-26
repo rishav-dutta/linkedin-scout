@@ -16,6 +16,11 @@ export async function functionErrorMessage(error: unknown, fallback: string): Pr
   return fallback;
 }
 
+// True when the n8n-proxy Edge Function turned the request away for the per-visitor rate limit
+export function isRateLimited(error: unknown): boolean {
+  return error instanceof FunctionsHttpError && error.context.status === 429;
+}
+
 export interface LinkedInLead {
   id: number;
   full_name: string;
