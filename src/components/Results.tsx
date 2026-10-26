@@ -1,6 +1,6 @@
 import { Check, ChevronDown, FileUp, Linkedin } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { functionErrorMessage, isScored, supabase, type LinkedInLead } from '../lib/supabase';
+import { functionErrorMessage, isRateLimited, isScored, supabase, type LinkedInLead } from '../lib/supabase';
 import { useLeads, type DetailsStatus } from '../lib/useLeads';
 import { track } from '../lib/analytics';
 import { Button } from './Button';
@@ -315,10 +315,12 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
     // the Edge Function checks the file contents either way
     if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
       setUploadError('Please upload a PDF file.');
+      track('resume-rejected');
       return;
     }
     if (file.size > MAX_RESUME_BYTES) {
       setUploadError('That file is over 5\u00a0MB. Please upload a smaller PDF.');
+      track('resume-rejected');
       return;
     }
 
@@ -349,7 +351,7 @@ function ResumeBar({ searchId, company, count, details, hasLeads, resumeName, on
       }
     } catch (error) {
       console.error('Error during resume processing:', error);
-      track('resume-error');
+      track(isRateLimited(error) ? 'resume-rate-limited' : 'resume-error');
       setUploadError(await functionErrorMessage(error, 'Your resume couldn’t be scored. Upload it again in a minute.'));
     } finally {
       setIsScanning(false);

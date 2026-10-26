@@ -99,15 +99,16 @@ Visits to the app and the docs page are counted with [GoatCounter](https://www.g
 
 | Event | When |
 |---|---|
-| `search`, `search-no-results`, `search-error` | A search is sent, finds nobody, or fails |
+| `search`, `search-no-results`, `search-error`, `search-rate-limited` | A search is sent, finds nobody, fails, or is turned away by the hourly limit |
 | `example-picked` | An example on the start screen fills the form |
 | `profiles-failed` | Full profiles didn't load, so the people can't be ranked |
-| `resume-upload`, `resume-ranked`, `resume-error` | A resume is sent, scored, or fails |
+| `resume-rejected` | A file is refused before upload (not a PDF, or over 5 MB) |
+| `resume-upload`, `resume-ranked`, `resume-error`, `resume-rate-limited` | A resume is sent, scored, fails, or is turned away by the hourly limit |
 | `details-opened` | A person's row is opened to read the reason and profile summary (not the top match opening by itself) |
 | `linkedin-profile` | A person's LinkedIn link is opened |
 | `docs-link`, `github-link`, `author-linkedin` | Header and footer links |
 
-The docs page counts clicks on Open the app, GitHub, LinkedIn and the PDF with `data-goatcounter-click`. Links with `?campaign=…&ref=…` show up as campaigns.
+The docs page counts clicks on Open the app, GitHub, LinkedIn and the PDF with `data-goatcounter-click`, and `docs-read-to-end` once per visit when About me scrolls into view. Links with `?campaign=…&ref=…` show up as campaigns.
 
 ## License
 
